@@ -1,5 +1,8 @@
 package agentes;
 
+import java.util.Random;
+
+import agentes.DelayBehaviour;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.*;
@@ -11,49 +14,59 @@ import jade.lang.acl.*;
 
 
 public class Enemy extends Agent {
-	private static final long serialVersionUID = 1L;
-	
-	protected void setup() {
-		AID agent = getService("fighter");
-		System.out.println("\nFighter: "+(agent==null ? "not Found" : agent.getName()));
-		
-		
-		addBehaviour( new SimpleBehaviour(this ) {
-			private static final long serialVersionUID = 1L;
-			private boolean result = false;
 
-			@Override
-			public void action() {
-				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-				msg.setContent( "Teje atacado!" );
-			    msg.addReceiver(agent);
-				send(msg);
-				result = true;
-			}
-
-			@Override
-			public boolean done() {
-				return result;
-			}
-		});
-		
-	}
-	
-	AID getService( String service ) {
-		DFAgentDescription dfd = new DFAgentDescription();
-			ServiceDescription sd = new ServiceDescription();
-			sd.setType( service );
-		dfd.addServices(sd);
-		try
+		private static final long serialVersionUID = 1L;
+		Random rnd = newRandom();
+		MessageTemplate template = MessageTemplate.MatchPerformative( ACLMessage.QUERY_REF );    
+		    
+		ACLMessage reply;
+		                                             
+		protected void setup() 
 		{
-			DFAgentDescription[] result = DFService.search(this, dfd);
-			if (result.length>0)
-				return result[0].getName() ;
-		}
-	    catch (FIPAException fe) { fe.printStackTrace(); }
-	  	return null;
-	}
-	
-	
+		  addBehaviour(new CyclicBehaviour(this) 
+		  {
+			private static final long serialVersionUID = 1L;
 
-}
+			public void action() 
+		     {
+		        ACLMessage msg = receive( template );
+		        if (msg!=null) {
+		               
+		        	// we create the reply 
+		            reply = msg.createReply();
+		            reply.setPerformative( ACLMessage.INFORM );
+		            reply.setContent("Mermão eu sou mal!" + rnd.nextInt(100));
+		        
+		            int delay = rnd.nextInt( 2000 );
+		            System.out.println( " - " +
+		               myAgent.getLocalName() + " <- QUERY from " +
+		               msg.getSender().getLocalName() +
+		               ".  Will answer in " + delay );
+		               
+		            // but only send it after a random delay
+		    
+		            addBehaviour( 
+		              new DelayBehaviour( myAgent, delay)
+		              {
+		            	  static final long serialVersionUID = 1L;
+
+						public void handleElapsedTimeout() { 
+		                     send(reply); }
+		              });
+		         }
+		         block();
+		     }
+		  });
+		}
+		
+		//==========================================    
+		//========== Utility methods ===============
+		//==========================================    
+		
+		
+		//--- generating distinct Random generator -------------------
+		
+		Random newRandom() 
+		{	return  new Random( hashCode() + System.currentTimeMillis()); }
+
+	}
