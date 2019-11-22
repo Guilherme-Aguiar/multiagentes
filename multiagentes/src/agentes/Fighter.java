@@ -13,19 +13,15 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.*;
 
 
-public class Fighter extends Agent {
+public class Fighter extends Characters {
 
 		private static final long serialVersionUID = 1L;
 		
-		private int life;
 		private int danoTotal;
 		
 		Random rnd = new Random( hashCode());
 		
 		MessageTemplate template ;    
-		
-	   int        bestPrice = 9999;
-	   ACLMessage bestOffer = null;
 		                                             
 		protected void setup() 
 		{ 
@@ -61,10 +57,9 @@ public class Fighter extends Agent {
 			            	life -= damage;
 			            	danoTotal += damage;
 			            	System.out.println("Vida atual é " + life);
-			            }
-			               
+			            }   
 			         }
-			      });
+			    });
 			}
 		    
 		    seq.addSubBehaviour(new OneShotBehaviour() {
@@ -75,7 +70,7 @@ public class Fighter extends Agent {
 					if( life != 1000)
 						System.out.println("dano total levado: " + danoTotal);
 					else
-						System.out.println("Got no damage");
+						System.out.println("no damage");
 				}
 		    	
 		    });

@@ -1,4 +1,4 @@
-package fighter;
+package agentes;
 
 import jade.core.Agent;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;

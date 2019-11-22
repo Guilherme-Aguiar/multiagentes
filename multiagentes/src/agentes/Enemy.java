@@ -13,7 +13,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.*;
 
 
-public class Enemy extends Agent {
+public class Enemy extends Characters {
 	
 
 
@@ -39,7 +39,7 @@ public class Enemy extends Agent {
 		            reply.setPerformative( ACLMessage.INFORM );
 		            reply.setContent("" + rnd.nextInt(100));
 		        
-		            int delay = rnd.nextInt( 2000 );
+		            int delay = rnd.nextInt( 1000 );
 		            System.out.println( " - " +
 		               myAgent.getLocalName() + " <- QUERY from " +
 		               msg.getSender().getLocalName() +
@@ -48,7 +48,7 @@ public class Enemy extends Agent {
 		            // but only send it after a random delay
 		    
 		            addBehaviour( 
-		              new DelayBehaviour( myAgent, 0)
+		              new DelayBehaviour( myAgent, delay)
 		              {
 		            	  static final long serialVersionUID = 1L;
 
