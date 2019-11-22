@@ -31,6 +31,7 @@ public class Enemy extends Characters {
 			sd.setName(getLocalName());
 			register(sd);
 			
+			
 		  addBehaviour(new CyclicBehaviour(this) 
 		  {
 			private static final long serialVersionUID = 1L;
@@ -43,18 +44,17 @@ public class Enemy extends Characters {
 		        	// we create the reply 
 		            reply = msg.createReply();
 		            reply.setPerformative( ACLMessage.INFORM );
-		            reply.setContent("" + rnd.nextInt(100));
+		            reply.setContent("yes");
 		        
-		            int delay = rnd.nextInt( 1000 );
 		            System.out.println( " - " +
 		               myAgent.getLocalName() + " <- QUERY from " +
 		               msg.getSender().getLocalName() +
-		               ".  Will answer in " + delay );
+		               ".  Will answer in 1 second");
 		               
 		            // but only send it after a random delay
 		    
 		            addBehaviour( 
-		              new DelayBehaviour( myAgent, delay)
+		              new DelayBehaviour( myAgent, 10)
 		              {
 		            	  static final long serialVersionUID = 1L;
 

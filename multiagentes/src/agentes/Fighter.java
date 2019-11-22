@@ -1,10 +1,11 @@
 package agentes;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import agentes.myReceiver;
 import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.*;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
@@ -18,20 +19,18 @@ public class Fighter extends Characters {
 
 		private static final long serialVersionUID = 1L;
 		
-		private int danoTotal;
+		AID [] enemies;
+
+		ArrayList<AID> hostile = new ArrayList<AID>();
 		
 		Random rnd = new Random( hashCode());
 		
 		MessageTemplate template ;    
 		                                             
 		protected void setup() 
+		
 		{ 
 			this.life = 1000;
-			this.danoTotal = 0;
-			AID [] inimigos =  searchDF("Enemy");
-			
-			System.out.println(inimigos);
-			
 			ServiceDescription sd = new ServiceDescription();
 			sd.setType("Fighter");
 			sd.setName(getLocalName());
@@ -49,36 +48,37 @@ public class Fighter extends Characters {
 		    ParallelBehaviour par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 		    seq.addSubBehaviour(par);
 		    
-		    for (int i = 0; i < 3; i++) {
+		    enemies =  searchDF("Enemy");
+
+		    for (int i = 0; i < enemies.length; i++) {
 		    	
-		    	msg.addReceiver(inimigos[i]);
+//		    	msg.addReceiver(new AID("sagat" + i, AID.ISLOCALNAME));
+		    	msg.addReceiver(enemies[i]);
 		    	
-		    	par.addSubBehaviour( new myReceiver(this, 1000, template )
+		    	
+		    	par.addSubBehaviour( new myReceiver(this, 1000, template, i )
 			      {
 					private static final long serialVersionUID = 1L;
-			
+
 					public void handle( ACLMessage msg ) 
 			         {  
 			            if (msg != null) {
-			            	int damage = Integer.parseInt(msg.getContent());
-			            	System.out.println("Recebeu dano de " + damage);
-			            	life -= damage;
-			            	danoTotal += damage;
-			            	System.out.println("Vida atual é " + life);
+			            	//System.out.println(msg.getContent());
+		            		hostile.add(enemies[this.i]);
+		            		
 			            }   
 			         }
 			    });
+		    	
 			}
+
 		    
 		    seq.addSubBehaviour(new OneShotBehaviour() {
 
 				private static final long serialVersionUID = 1L;
 
 				public void action() {
-					if( life != 1000)
-						System.out.println("dano total levado: " + danoTotal);
-					else
-						System.out.println("no damage");
+					System.out.println(hostile);
 				}
 		    	
 		    });

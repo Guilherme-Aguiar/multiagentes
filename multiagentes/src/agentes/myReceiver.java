@@ -23,15 +23,18 @@ public class myReceiver extends SimpleBehaviour
 	            wakeupTime;
 	private boolean finished;
 	
+	protected int i;
+	
 	private ACLMessage msg;
 	
 	public ACLMessage getMessage() { return msg; }
 	
 	
-	public myReceiver(Agent a, int millis, MessageTemplate mt) {
+	public myReceiver(Agent a, int millis, MessageTemplate mt, int i) {
 		super(a);
 		timeOut = millis;
 		template = mt;
+		this.i = i;
 	}
 	
 	public void onStart() {
