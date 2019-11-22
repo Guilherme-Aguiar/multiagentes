@@ -9,6 +9,7 @@ import jade.core.behaviours.*;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.*;
 
@@ -27,7 +28,14 @@ public class Fighter extends Characters {
 		{ 
 			this.life = 1000;
 			this.danoTotal = 0;
+			AID [] inimigos =  searchDF("Enemy");
 			
+			System.out.println(inimigos);
+			
+			ServiceDescription sd = new ServiceDescription();
+			sd.setType("Fighter");
+			sd.setName(getLocalName());
+			register(sd);
 			
 		    ACLMessage msg = newMsg( ACLMessage.QUERY_REF); 
 		    
@@ -41,9 +49,9 @@ public class Fighter extends Characters {
 		    ParallelBehaviour par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 		    seq.addSubBehaviour(par);
 		    
-		    for (int i = 1; i <= 3; i++) {
+		    for (int i = 0; i < 3; i++) {
 		    	
-		    	msg.addReceiver( new AID( "sagat" + i,  AID.ISLOCALNAME ));
+		    	msg.addReceiver(inimigos[i]);
 		    	
 		    	par.addSubBehaviour( new myReceiver(this, 1000, template )
 			      {
@@ -95,6 +103,43 @@ public class Fighter extends Characters {
 		  return  cidBase + (cidCnt++); 
 		}
 		
+		void register( ServiceDescription sd) {
+			DFAgentDescription dfd = new DFAgentDescription();
+			dfd.setName(getAID());
+			dfd.addServices(sd);
+			try {
+				DFService.register(this, dfd);
+			} catch (FIPAException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
+		AID [] searchDF( String service )
+		//---------------------------------
+		{
+		    DFAgentDescription dfd = new DFAgentDescription();
+		        ServiceDescription sd = new ServiceDescription();
+		        sd.setType( service );
+		    dfd.addServices(sd);
+		    
+		    SearchConstraints ALL = new SearchConstraints();
+		    ALL.setMaxResults(new Long(-1));
+
+		    try
+		    {
+		        DFAgentDescription[] result = DFService.search(this, dfd, ALL);
+		        AID[] agents = new AID[result.length];
+		        for (int i=0; i<result.length; i++) 
+		            agents[i] = result[i].getName() ;
+		        return agents;
+
+		    }
+		    catch (FIPAException fe) { fe.printStackTrace(); }
+		    
+		      return null;
+		}
 		
 		//--- Methods to initialize ACLMessages -------------------
 		

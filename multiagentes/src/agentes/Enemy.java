@@ -25,6 +25,12 @@ public class Enemy extends Characters {
 		                                             
 		protected void setup() 
 		{
+			
+			ServiceDescription sd = new ServiceDescription();
+			sd.setType("Enemy");
+			sd.setName(getLocalName());
+			register(sd);
+			
 		  addBehaviour(new CyclicBehaviour(this) 
 		  {
 			private static final long serialVersionUID = 1L;
@@ -64,6 +70,18 @@ public class Enemy extends Characters {
 		//==========================================    
 		//========== Utility methods ===============
 		//==========================================    
+		
+		void register( ServiceDescription sd) {
+			DFAgentDescription dfd = new DFAgentDescription();
+			dfd.setName(getAID());
+			dfd.addServices(sd);
+			try {
+				DFService.register(this, dfd);
+			} catch (FIPAException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		
 		//--- generating distinct Random generator -------------------
