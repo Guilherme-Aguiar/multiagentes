@@ -17,36 +17,70 @@ public class Fighter extends Agent {
 
 		private static final long serialVersionUID = 1L;
 		
+		private int life;
+		private int danoTotal;
+		
 		Random rnd = new Random( hashCode());
 		
 		MessageTemplate template ;    
+		
+	   int        bestPrice = 9999;
+	   ACLMessage bestOffer = null;
 		                                             
 		protected void setup() 
 		{ 
-		    ACLMessage msg = newMsg( ACLMessage.QUERY_REF, "Você é hostil?",
-		                         new AID( "s1", AID.ISLOCALNAME) ); 
+			this.life = 1000;
+			this.danoTotal = 0;
+			
+			
+		    ACLMessage msg = newMsg( ACLMessage.QUERY_REF); 
 		    
 		    template = MessageTemplate.and( 
 		        MessageTemplate.MatchPerformative( ACLMessage.INFORM ),
 		        MessageTemplate.MatchConversationId( msg.getConversationId() ));
-		         
-		   addBehaviour( new myReceiver(this, 1000, template )
-		      {
-				private static final long serialVersionUID = 1L;
-		
-				public void handle( ACLMessage msg ) 
-		         {  
-		            if (msg == null) 
-		               System.out.println("Fighter: Timeout");
-		            else 
-		               System.out.println("Fighter received answer: "+ msg);
-		
-		         }
-		      });
 		    
+		    SequentialBehaviour seq = new SequentialBehaviour();
+		    addBehaviour(seq);
+		    
+		    ParallelBehaviour par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
+		    seq.addSubBehaviour(par);
+		    
+		    for (int i = 1; i <= 3; i++) {
+		    	
+		    	msg.addReceiver( new AID( "sagat" + i,  AID.ISLOCALNAME ));
+		    	
+		    	par.addSubBehaviour( new myReceiver(this, 1000, template )
+			      {
+					private static final long serialVersionUID = 1L;
+			
+					public void handle( ACLMessage msg ) 
+			         {  
+			            if (msg != null) {
+			            	int damage = Integer.parseInt(msg.getContent());
+			            	System.out.println("Recebeu dano de " + damage);
+			            	life -= damage;
+			            	danoTotal += damage;
+			            	System.out.println("Vida atual é " + life);
+			            }
+			               
+			         }
+			      });
+			}
+		    
+		    seq.addSubBehaviour(new OneShotBehaviour() {
+
+				private static final long serialVersionUID = 1L;
+
+				public void action() {
+					if( life != 1000)
+						System.out.println("dano total levado: " + danoTotal);
+					else
+						System.out.println("Got no damage");
+				}
+		    	
+		    });
+		         
 		    send ( msg );
-		
-		
 		}
 		
 		//========== Utility methods =========================

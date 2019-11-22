@@ -14,6 +14,8 @@ import jade.lang.acl.*;
 
 
 public class Enemy extends Agent {
+	
+
 
 		private static final long serialVersionUID = 1L;
 		Random rnd = newRandom();
@@ -35,7 +37,7 @@ public class Enemy extends Agent {
 		        	// we create the reply 
 		            reply = msg.createReply();
 		            reply.setPerformative( ACLMessage.INFORM );
-		            reply.setContent("Mermão eu sou mal!" + rnd.nextInt(100));
+		            reply.setContent("" + rnd.nextInt(100));
 		        
 		            int delay = rnd.nextInt( 2000 );
 		            System.out.println( " - " +
@@ -46,7 +48,7 @@ public class Enemy extends Agent {
 		            // but only send it after a random delay
 		    
 		            addBehaviour( 
-		              new DelayBehaviour( myAgent, delay)
+		              new DelayBehaviour( myAgent, 0)
 		              {
 		            	  static final long serialVersionUID = 1L;
 
