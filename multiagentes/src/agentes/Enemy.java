@@ -1,5 +1,6 @@
 package agentes;
 
+import java.io.IOException;
 import java.util.Random;
 
 import agentes.DelayBehaviour;
@@ -41,10 +42,11 @@ public class Enemy extends Characters {
 		        ACLMessage msg = receive( template );
 		        if (msg!=null) {
 		               
+		        	
 		        	// we create the reply 
 		            reply = msg.createReply();
 		            reply.setPerformative( ACLMessage.INFORM );
-		            reply.setContent("yes");
+					reply.setContent("yes-" + life);
 		        
 		            System.out.println( " - " +
 		               myAgent.getLocalName() + " <- QUERY from " +

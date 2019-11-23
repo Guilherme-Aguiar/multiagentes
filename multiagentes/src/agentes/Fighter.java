@@ -2,6 +2,8 @@ package agentes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 
 import agentes.myReceiver;
@@ -13,7 +15,7 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.*;
-
+import simple.Enemy;
 
 public class Fighter extends Characters {
 
@@ -21,7 +23,7 @@ public class Fighter extends Characters {
 		
 		AID [] enemies;
 
-		ArrayList<AID> hostile = new ArrayList<AID>();
+		ArrayList<Enemy> hostile = new ArrayList<Enemy>();
 		
 		Random rnd = new Random( hashCode());
 		
@@ -63,21 +65,22 @@ public class Fighter extends Characters {
 					public void handle( ACLMessage msg ) 
 			         {  
 			            if (msg != null) {
-			            	//System.out.println(msg.getContent());
-		            		hostile.add(enemies[this.i]);
+							if(msg.getContent().split("-",2)[0] == "yes");
+								System.out.println(msg.getContent().split("-",2)[1]);
+		            			hostile.add(new Enemy(enemies[this.i],msg.getContent().split("-",2)[1]));
 		            		
 			            }   
 			         }
 			    });
 		    	
 			}
-
 		    
 		    seq.addSubBehaviour(new OneShotBehaviour() {
 
 				private static final long serialVersionUID = 1L;
 
 				public void action() {
+					System.out.println("aq");
 					System.out.println(hostile);
 				}
 		    	
