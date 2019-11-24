@@ -21,8 +21,10 @@ public class Fighter extends Characters {
 
 	private static final long serialVersionUID = 1L;
 
-	AID[] enemies;
-
+	//AID[] enemies;
+	
+	ArrayList<AID> enemies = new ArrayList<AID>();
+	
 	ArrayList<Enemy> hostile = new ArrayList<Enemy>();
 
 	Random rnd = new Random(hashCode());
@@ -59,11 +61,28 @@ public class Fighter extends Characters {
 		ParallelBehaviour par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 		seq.addSubBehaviour(par);
 
-		searchHostiles(salute, par);
+		enemies = searchDF("Enemy");
+		for (int i = 0; i < this.enemies.size(); i++) {
+//				    	salute.addReceiver(new AID("sagat" + i, AID.ISLOCALNAME));
+			salute.addReceiver(enemies.get(i));
+
+			par.addSubBehaviour(new myReceiver(this, 1000, saluteTemplate, i) {
+				private static final long serialVersionUID = 1L;
+
+				public void handle(ACLMessage salute) {
+					if (salute != null) {
+						if (salute.getContent().split("-", 2)[0] == "yes");
+						System.out.println(salute.getContent().split("-", 2)[1]);
+						hostile.add(new Enemy(enemies.get(0), salute.getContent().split("-", 2)[1]));
+						enemies.remove(0);
+					}
+				}
+			});
+
+		}
 		
 		seq.addSubBehaviour(new CyclicBehaviour(this) {
 
-			private int interator = 0;
 			private static final long serialVersionUID = 1L;
 
 			public void action() {
@@ -74,18 +93,27 @@ public class Fighter extends Characters {
 						fight.setContent("500");
 
 					} else {
+						enemies = searchDF("Enemy");
+						System.out.println("t" + enemies.size());
+						System.out.println(hostile.isEmpty());
+						salute.addReceiver(enemies.get(0));
+						send(salute);
+						addBehaviour(new myReceiver(myAgent, 1000, saluteTemplate) {
+							private static final long serialVersionUID = 1L;
+							public void handle(ACLMessage salute) {
+								System.out.println("EEEEEEEEEE" + salute.getContent());
+								hostile.add(new Enemy(enemies.get(0), salute.getContent().split("-", 2)[1]));
+							}
 							
-						ParallelBehaviour par2 = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
-						seq.addSubBehaviour(par2);
-						searchHostiles(salute, par2);
-						System.out.println(hostile);
+						});
+						
 					}
 				} 
 			}
 
 		});
 
-		addBehaviour(new TickerBehaviour(this, 5000) {
+		addBehaviour(new TickerBehaviour(this, 3000) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -114,36 +142,12 @@ public class Fighter extends Characters {
 				});
 			}
 		});
-
-	}
-
-	// ========== Utility methods =========================
-
-	public void searchHostiles(ACLMessage salute, ParallelBehaviour par) {
-		this.enemies = searchDF("Enemy");
-		System.out.println(this.enemies.length);
-		for (int i = 0; i < this.enemies.length; i++) {
-//				    	salute.addReceiver(new AID("sagat" + i, AID.ISLOCALNAME));
-			salute.addReceiver(enemies[i]);
-			System.out.println(salute);
-			par.addSubBehaviour(new myReceiver(this, 1000, saluteTemplate, i) {
-				private static final long serialVersionUID = 1L;
-
-				public void handle(ACLMessage salute) {
-					if (salute != null) {
-						if (salute.getContent().split("-", 2)[0] == "yes");
-						System.out.println(salute.getContent().split("-", 2)[1]);
-						hostile.add(new Enemy(enemies[this.i], salute.getContent().split("-", 2)[1]));
-
-					}
-				}
-			});
-
-		}
 		
 		send(salute);
 
 	}
+
+	// ========== Utility methods =========================
 
 	// --- generating Conversation IDs -------------------
 
@@ -176,7 +180,7 @@ public class Fighter extends Characters {
 		}
 	}
 
-	AID[] searchDF(String service)
+	ArrayList<AID> searchDF(String service)
 	// ---------------------------------
 	{
 		DFAgentDescription dfd = new DFAgentDescription();
@@ -189,9 +193,9 @@ public class Fighter extends Characters {
 
 		try {
 			DFAgentDescription[] result = DFService.search(this, dfd, ALL);
-			AID[] agents = new AID[result.length];
+			ArrayList<AID> agents = new ArrayList<AID>();
 			for (int i = 0; i < result.length; i++)
-				agents[i] = result[i].getName();
+				agents.add(result[i].getName());
 			return agents;
 
 		} catch (FIPAException fe) {
