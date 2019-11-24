@@ -20,9 +20,13 @@ public class Enemy extends Characters {
 
 		private static final long serialVersionUID = 1L;
 		Random rnd = newRandom();
-		MessageTemplate template = MessageTemplate.MatchPerformative( ACLMessage.QUERY_REF );    
+		MessageTemplate saluteTemplate = MessageTemplate.MatchPerformative( ACLMessage.QUERY_REF );    
+		MessageTemplate fightTemplate = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 		    
-		ACLMessage reply;
+		ACLMessage saluteReply;
+		ACLMessage fightReply;
+		
+		int life = 1000;
 		                                             
 		protected void setup() 
 		{
@@ -39,36 +43,54 @@ public class Enemy extends Characters {
 
 			public void action() 
 		     {
-		        ACLMessage msg = receive( template );
-		        if (msg!=null) {
+		        ACLMessage saluteMsg = receive( saluteTemplate );
+		        ACLMessage fightMsg = receive(fightTemplate);
+		        
+		        
+		        if (saluteMsg!=null) {
 		               
 		        	
 		        	// we create the reply 
-		            reply = msg.createReply();
-		            reply.setPerformative( ACLMessage.INFORM );
-					reply.setContent("yes-" + life);
+		            saluteReply = saluteMsg.createReply();
+		            saluteReply.setPerformative( ACLMessage.INFORM );
+					saluteReply.setContent("yes-" + life);
 		        
 		            System.out.println( " - " +
-		               myAgent.getLocalName() + " <- QUERY from " +
-		               msg.getSender().getLocalName() +
-		               ".  Will answer in 1 second");
+		               myAgent.getLocalName() + " <- Recebeu QUERY do " +
+		               saluteMsg.getSender().getLocalName());
 		               
 		            // but only send it after a random delay
 		    
 		            addBehaviour( 
-		              new DelayBehaviour( myAgent, 10)
+		              new DelayBehaviour( myAgent, 100)
 		              {
 		            	  static final long serialVersionUID = 1L;
 
 						public void handleElapsedTimeout() { 
-		                     send(reply); }
+		                     send(saluteReply); }
 		              });
 		         }
+		        
+		         if (fightMsg!=null) {
+		           
+		        	// we create the reply 
+		            fightReply = fightMsg.createReply();
+		            fightReply.setPerformative( ACLMessage.INFORM );
+		            fightReply.setContent("devolvi" + 500);
+		        
+		            System.out.println(fightMsg.getContent());
+		               
+		            send(fightReply); 
+		         }
+		        
+		        
 		         block();
 		     }
 		  });
+
+		  
+		  
 		}
-		
 		//==========================================    
 		//========== Utility methods ===============
 		//==========================================    

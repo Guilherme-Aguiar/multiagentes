@@ -27,7 +27,13 @@ public class Fighter extends Characters {
 		
 		Random rnd = new Random( hashCode());
 		
-		MessageTemplate template ;    
+		MessageTemplate saluteTemplate; 
+		
+		MessageTemplate fightTemplate;
+		
+		
+		private AID Nemesis;
+		private boolean hasNemesis = false;
 		                                             
 		protected void setup() 
 		
@@ -38,36 +44,46 @@ public class Fighter extends Characters {
 			sd.setName(getLocalName());
 			register(sd);
 			
-		    ACLMessage msg = newMsg( ACLMessage.QUERY_REF); 
+		    ACLMessage salute = newMsg( ACLMessage.QUERY_REF); 
 		    
-		    template = MessageTemplate.and( 
+		    ACLMessage fight = newMsg(ACLMessage.INFORM);
+		    
+		    saluteTemplate = MessageTemplate.and( 
 		        MessageTemplate.MatchPerformative( ACLMessage.INFORM ),
-		        MessageTemplate.MatchConversationId( msg.getConversationId() ));
+		        MessageTemplate.MatchConversationId( salute.getConversationId() ));
 		    
-		    SequentialBehaviour seq = new SequentialBehaviour();
+		    fightTemplate = MessageTemplate.and( 
+			        MessageTemplate.MatchPerformative( ACLMessage.INFORM ),
+			        MessageTemplate.MatchConversationId( fight.getConversationId() ));
+		    
+		    
+		    
+
+
+		    SequentialBehaviour seq = new SequentialBehaviour(); 
 		    addBehaviour(seq);
 		    
 		    ParallelBehaviour par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
 		    seq.addSubBehaviour(par);
 		    
 		    enemies =  searchDF("Enemy");
-
+		    
 		    for (int i = 0; i < enemies.length; i++) {
 		    	
-//		    	msg.addReceiver(new AID("sagat" + i, AID.ISLOCALNAME));
-		    	msg.addReceiver(enemies[i]);
+//				    	salute.addReceiver(new AID("sagat" + i, AID.ISLOCALNAME));
+		    	salute.addReceiver(enemies[i]);
 		    	
 		    	
-		    	par.addSubBehaviour( new myReceiver(this, 1000, template, i )
+		    	par.addSubBehaviour( new myReceiver(this, 1000, saluteTemplate, i )
 			      {
 					private static final long serialVersionUID = 1L;
 
-					public void handle( ACLMessage msg ) 
+					public void handle( ACLMessage salute ) 
 			         {  
-			            if (msg != null) {
-							if(msg.getContent().split("-",2)[0] == "yes");
-								System.out.println(msg.getContent().split("-",2)[1]);
-		            			hostile.add(new Enemy(enemies[this.i],msg.getContent().split("-",2)[1]));
+			            if (salute != null) {
+							if(salute.getContent().split("-",2)[0] == "yes");
+								System.out.println(salute.getContent().split("-",2)[1]);
+		            			hostile.add(new Enemy(enemies[this.i],salute.getContent().split("-",2)[1]));
 		            		
 			            }   
 			         }
@@ -80,13 +96,39 @@ public class Fighter extends Characters {
 				private static final long serialVersionUID = 1L;
 
 				public void action() {
-					System.out.println("aq");
-					System.out.println(hostile);
+					for (int j = 0; j < hostile.size(); j++) {
+						System.out.println(hostile.get(j).getAid());
+					}
+					fight.addReceiver(hostile.get(0).getAid());
+					hasNemesis = true;
+					fight.setContent("dei" + 500);
+					
 				}
 		    	
 		    });
-		         
-		    send ( msg );
+		     
+		    send ( salute );
+		    
+		    
+		    addBehaviour(new TickerBehaviour(this, 5000) {
+				private static final long serialVersionUID = 1L;
+				@Override
+				protected void onTick() {
+					send(fight);
+					addBehaviour(new myReceiver(myAgent, 1000, fightTemplate) {
+						private static final long serialVersionUID = 1L;
+						public void handle( ACLMessage fight) {
+							if(fight != null) { 
+								System.out.println(fight.getContent());
+							}
+						}
+			    	});
+				}
+		    });
+
+
+	    	
+		    
 		}
 		
 		//========== Utility methods =========================

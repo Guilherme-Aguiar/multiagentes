@@ -37,6 +37,12 @@ public class myReceiver extends SimpleBehaviour
 		this.i = i;
 	}
 	
+	public myReceiver(Agent a, int millis, MessageTemplate mt) {
+		super(a);
+		timeOut = millis;
+		template = mt;
+	}
+	
 	public void onStart() {
 		wakeupTime = (timeOut<0 ? Long.MAX_VALUE
 		              :System.currentTimeMillis() + timeOut);
