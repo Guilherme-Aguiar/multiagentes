@@ -90,17 +90,25 @@ public class Fighter extends Characters {
 		    	
 			}
 		    
-		    seq.addSubBehaviour(new OneShotBehaviour() {
+		    seq.addSubBehaviour(new CyclicBehaviour(this)  {
 
+		    	private int interator = 0;
 				private static final long serialVersionUID = 1L;
 
 				public void action() {
-					for (int j = 0; j < hostile.size(); j++) {
-						System.out.println(hostile.get(j).getAid());
+					if(!hasNemesis) {
+						
+						for (int j = 0; j < hostile.size(); j++) {
+							System.out.println(hostile.get(j).getAid());
+						}
+						fight.addReceiver(hostile.get(0).getAid());
+						hasNemesis = true;
+						fight.setContent("500");
+						
+						
+					}else {
+//						System.out.println(hostile);
 					}
-					fight.addReceiver(hostile.get(0).getAid());
-					hasNemesis = true;
-					fight.setContent("500");
 					
 				}
 		    	
@@ -118,11 +126,20 @@ public class Fighter extends Characters {
 						private static final long serialVersionUID = 1L;
 						public void handle( ACLMessage fight) {
 							if(fight != null) { 
-								takeDamage(Integer.parseInt(fight.getContent()));
+								System.out.println(fight.getContent());
+								if(fight.getContent() == "Morri") {
+									System.out.println(hostile);
+									hostile.remove(0);
+									System.out.println(hostile);
+								}else {
+							
+									takeDamage(Integer.parseInt(fight.getContent()));
+								}
 								System.out.println("Fighter: " + getLife());
 							}
 							if(getLife() <= 0 ) {
 								System.out.println("Morreu o fighter");
+								hasNemesis = false;
 								doDelete();
 							}
 						}

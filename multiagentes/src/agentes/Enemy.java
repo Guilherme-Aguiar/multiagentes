@@ -81,12 +81,23 @@ public class Enemy extends Characters {
 		            
 		            takeDamage(Integer.parseInt(fightMsg.getContent()));
 		            System.out.println("Enemy: " + getLife());
+		            
+		            addBehaviour( 
+				              new DelayBehaviour( myAgent, 100)
+				              {
+				            	  static final long serialVersionUID = 1L;
+
+								public void handleElapsedTimeout() { 
+				                     send(fightReply); }
+				              });
 		               
-		            send(fightReply); 
+//		            send(fightReply); 
 		         }
 		         
 		         if(getLife() <= 0 ) {
 					System.out.println("Morreu o Enemy");
+					fightReply.setContent("Morri");
+					send(fightReply);				
 					doDelete();
 				}
 		        
