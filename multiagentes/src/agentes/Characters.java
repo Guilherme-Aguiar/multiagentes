@@ -25,4 +25,7 @@ public abstract class Characters extends Agent {
 	public void setMana(int mana) {
 		this.mana = mana;
 	}
+	public void takeDamage(int damage) {
+		this.life -= damage; 
+	}
 }

@@ -31,7 +31,6 @@ public class Fighter extends Characters {
 		
 		MessageTemplate fightTemplate;
 		
-		
 		private AID Nemesis;
 		private boolean hasNemesis = false;
 		                                             
@@ -101,7 +100,7 @@ public class Fighter extends Characters {
 					}
 					fight.addReceiver(hostile.get(0).getAid());
 					hasNemesis = true;
-					fight.setContent("dei" + 500);
+					fight.setContent("500");
 					
 				}
 		    	
@@ -119,14 +118,17 @@ public class Fighter extends Characters {
 						private static final long serialVersionUID = 1L;
 						public void handle( ACLMessage fight) {
 							if(fight != null) { 
-								System.out.println(fight.getContent());
+								takeDamage(Integer.parseInt(fight.getContent()));
+								System.out.println("Fighter: " + getLife());
+							}
+							if(getLife() <= 0 ) {
+								System.out.println("Morreu o fighter");
+								doDelete();
 							}
 						}
 			    	});
 				}
 		    });
-
-
 	    	
 		    
 		}
@@ -146,6 +148,11 @@ public class Fighter extends Characters {
 		                  System.currentTimeMillis()%10000 + "_";
 		  }
 		  return  cidBase + (cidCnt++); 
+		}
+		
+		 protected void takeDown() {
+			 try { DFService.deregister(this); 
+			 } catch (Exception e) {}        
 		}
 		
 		void register( ServiceDescription sd) {

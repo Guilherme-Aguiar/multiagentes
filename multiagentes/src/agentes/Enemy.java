@@ -26,10 +26,10 @@ public class Enemy extends Characters {
 		ACLMessage saluteReply;
 		ACLMessage fightReply;
 		
-		int life = 1000;
 		                                             
 		protected void setup() 
 		{
+			this.life = 1000; 
 			
 			ServiceDescription sd = new ServiceDescription();
 			sd.setType("Enemy");
@@ -76,13 +76,19 @@ public class Enemy extends Characters {
 		        	// we create the reply 
 		            fightReply = fightMsg.createReply();
 		            fightReply.setPerformative( ACLMessage.INFORM );
-		            fightReply.setContent("devolvi" + 500);
-		        
-		            System.out.println(fightMsg.getContent());
+		            fightReply.setContent("500");
+		            
+		            
+		            takeDamage(Integer.parseInt(fightMsg.getContent()));
+		            System.out.println("Enemy: " + getLife());
 		               
 		            send(fightReply); 
 		         }
-		        
+		         
+		         if(getLife() <= 0 ) {
+					System.out.println("Morreu o Enemy");
+					doDelete();
+				}
 		        
 		         block();
 		     }
@@ -105,6 +111,11 @@ public class Enemy extends Characters {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		
+		 protected void takeDown() {
+			 try { DFService.deregister(this); 
+			 } catch (Exception e) {}        
 		}
 		
 		
