@@ -81,11 +81,11 @@ public class Fighter extends Characters {
 
 		}
 		
-		seq.addSubBehaviour(new CyclicBehaviour(this) {
+		seq.addSubBehaviour(new TickerBehaviour(this, 1000) {
 
 			private static final long serialVersionUID = 1L;
 
-			public void action() {
+			public void onTick() {
 				if (!isFighting) {
 					if (!hostile.isEmpty()) {
 						fight.addReceiver(hostile.get(0).getAid());
@@ -94,26 +94,27 @@ public class Fighter extends Characters {
 
 					} else {
 						enemies = searchDF("Enemy");
-						System.out.println("t" + enemies.size());
-						System.out.println(hostile.isEmpty());
-						salute.addReceiver(enemies.get(0));
-						send(salute);
-						addBehaviour(new myReceiver(myAgent, 1000, saluteTemplate) {
-							private static final long serialVersionUID = 1L;
-							public void handle(ACLMessage salute) {
-								System.out.println("EEEEEEEEEE" + salute.getContent());
-								hostile.add(new Enemy(enemies.get(0), salute.getContent().split("-", 2)[1]));
-							}
+						if(!enemies.isEmpty()) {
 							
-						});
-						
+							salute.addReceiver(enemies.get(0));
+							send(salute);
+							addBehaviour(new myReceiver(myAgent, 1000, saluteTemplate) {
+								private static final long serialVersionUID = 1L;
+								public void handle(ACLMessage salute) {
+									if(salute != null ) {
+										System.out.println(salute.getContent());
+										hostile.add(new Enemy(enemies.get(0), salute.getContent().split("-", 2)[1]));
+										
+									}
+								}
+							});
+						}
 					}
 				} 
 			}
-
 		});
 
-		addBehaviour(new TickerBehaviour(this, 3000) {
+		addBehaviour(new TickerBehaviour(this, 1000) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
