@@ -80,7 +80,7 @@ public class Enemy extends Characters {
 		            
 		            
 		            takeDamage(Integer.parseInt(fightMsg.getContent()));
-		            System.out.println("Enemy: " + getLife());
+		            System.out.println("Enemy " + myAgent.getLocalName() + ": " +  getLife());
 		            
 		            addBehaviour( 
 				              new DelayBehaviour( myAgent, 100)
