@@ -33,8 +33,9 @@ public class Fighter extends Characters {
 
 	MessageTemplate fightTemplate;
 
-	private AID Nemesis;
 	private boolean isFighting = false;
+	
+	int counter =1;
 
 	protected void setup()
 
@@ -72,8 +73,8 @@ public class Fighter extends Characters {
 				public void handle(ACLMessage salute) {
 					if (salute != null) {
 						if (salute.getContent().split("-", 2)[0] == "yes");
-						System.out.println(salute.getContent().split("-", 2)[1]);
-						hostile.add(new Enemy(enemies.get(0), salute.getContent().split("-", 2)[1]));
+						//System.out.println(salute.getContent().split("-", 2)[1]);
+						//hostile.add(new Enemy(enemies.get(0), salute.getContent().split("-", 2)[1]));
 						enemies.remove(0);
 					}
 				}
@@ -90,7 +91,7 @@ public class Fighter extends Characters {
 					if (!hostile.isEmpty()) {
 						fight.addReceiver(hostile.get(0).getAid());
 						isFighting = true;
-						fight.setContent("500");
+						fight.setContent("100");
 
 					} else {
 						enemies = searchDF("Enemy");
@@ -102,7 +103,7 @@ public class Fighter extends Characters {
 								private static final long serialVersionUID = 1L;
 								public void handle(ACLMessage salute) {
 									if(salute != null ) {
-										System.out.println(salute.getContent());
+										//System.out.println(salute.getContent());
 										hostile.add(new Enemy(enemies.get(0), salute.getContent().split("-", 2)[1]));
 										
 									}
@@ -126,17 +127,22 @@ public class Fighter extends Characters {
 					public void handle(ACLMessage fight) {
 						if (fight != null) {
 							if (fight.getContent().equals("Morri")) {
-								System.out.println(hostile);
 								hostile.remove(0);
 								isFighting = false;
-								System.out.println(hostile);
+								addBehaviour(new DelayBehaviour(myAgent,1500) {
+									private static final long serialVersionUID = 1L;
+									protected void handleElapsedTimeout() {
+										System.out.println("----------- FASE " + ++counter + " -----------" );
+									}
+								});
+								
 							} else {
 								takeDamage(Integer.parseInt(fight.getContent()));
 							}
-							System.out.println("Fighter: " + getLife());
+							System.out.println("HEROI [" + myAgent.getLocalName() + "]    - VIDA ATUAL:" +  getLife());
 						}
 						if (getLife() <= 0) {
-							System.out.println("Morreu o fighter");
+							System.out.println("GAME OVER " + getLocalName());
 							doDelete();
 						}
 					}
