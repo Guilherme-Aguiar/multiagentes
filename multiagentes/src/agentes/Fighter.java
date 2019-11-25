@@ -123,7 +123,7 @@ public class Fighter extends Characters {
 			
 		});
 		
-		addBehaviour(new TickerBehaviour(this, 15000) {
+		addBehaviour(new TickerBehaviour(this, 30000) {
 			private static final long serialVersionUID = 1L;
 			
 			
