@@ -24,23 +24,32 @@ public class Fighter extends Characters {
 	//AID[] enemies;
 	
 	ArrayList<AID> enemies = new ArrayList<AID>();
-	
 	ArrayList<Enemy> hostile = new ArrayList<Enemy>();
 
 	Random rnd = new Random(hashCode());
 
 	MessageTemplate saluteTemplate;
-
 	MessageTemplate fightTemplate;
+	MessageTemplate helpTemplate;
+	
+	MessageTemplate healerOffer = MessageTemplate.MatchPerformative( ACLMessage.QUERY_REF );    
+	MessageTemplate healerHelp = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+	
+	ACLMessage offerReply;
+	
+	Random randomGenerator = new Random();
 
 	private boolean isFighting = false;
 	
 	int counter =1;
+	int healCount = 0;
+	int randomInt;
 
 	protected void setup()
 
 	{
 		this.life = 3000;
+		
 		ServiceDescription sd = new ServiceDescription();
 		sd.setType("Fighter");
 		sd.setName(getLocalName());
@@ -49,12 +58,17 @@ public class Fighter extends Characters {
 		ACLMessage salute = newMsg(ACLMessage.QUERY_REF);
 
 		ACLMessage fight = newMsg(ACLMessage.INFORM);
+		
+		ACLMessage askHelp = newMsg(ACLMessage.INFORM);
 
 		saluteTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
 				MessageTemplate.MatchConversationId(salute.getConversationId()));
 
 		fightTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
 				MessageTemplate.MatchConversationId(fight.getConversationId()));
+		
+		helpTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+				MessageTemplate.MatchConversationId(askHelp.getConversationId()));
 
 		SequentialBehaviour seq = new SequentialBehaviour();
 		addBehaviour(seq);
@@ -82,6 +96,44 @@ public class Fighter extends Characters {
 
 		}
 		
+		addBehaviour(new TickerBehaviour(this, 3000) {
+			private static final long serialVersionUID = 1L;
+			
+			
+			protected void onTick() {
+				
+				
+				
+				addBehaviour(new myReceiver(myAgent,1000,healerOffer) {
+					private static final long serialVersionUID = 1L;
+
+					public void handle(ACLMessage offer) {
+						if (offer != null) {
+							if(life < 400 && healCount < 3) {
+								healDamage(Integer.parseInt(offer.getContent()));
+								System.out.println("HEALER [" + offer.getSender().getLocalName() + "] - CUROU 400!" );
+								healCount++;
+								//System.out.println(healCount);
+							}
+						}
+					}
+				});
+			}
+			
+			
+		});
+		
+		addBehaviour(new TickerBehaviour(this, 15000) {
+			private static final long serialVersionUID = 1L;
+			
+			
+			protected void onTick() {
+				healCount =0;
+			}
+			
+			
+		});
+		
 		seq.addSubBehaviour(new TickerBehaviour(this, 1000) {
 
 			private static final long serialVersionUID = 1L;
@@ -91,7 +143,8 @@ public class Fighter extends Characters {
 					if (!hostile.isEmpty()) {
 						fight.addReceiver(hostile.get(0).getAid());
 						isFighting = true;
-						fight.setContent("100");
+						randomInt = randomGenerator.nextInt(200) + 1;
+						fight.setContent(""+randomInt);
 
 					} else {
 						enemies = searchDF("Enemy");

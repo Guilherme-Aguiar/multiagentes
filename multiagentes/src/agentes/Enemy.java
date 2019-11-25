@@ -26,6 +26,8 @@ public class Enemy extends Characters {
 		ACLMessage saluteReply;
 		ACLMessage fightReply;
 		
+		Random randomGenerator = new Random();
+		int randomInt;
 		                                             
 		protected void setup() 
 		{
@@ -76,7 +78,8 @@ public class Enemy extends Characters {
 		        	// we create the reply 
 		            fightReply = fightMsg.createReply();
 		            fightReply.setPerformative( ACLMessage.INFORM );
-		            fightReply.setContent("100");
+		            randomInt = randomGenerator.nextInt(200) + 1;
+		            fightReply.setContent(""+randomInt);
 		            
 		            
 		            takeDamage(Integer.parseInt(fightMsg.getContent()));
