@@ -1,5 +1,6 @@
 package agentes;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import jade.core.AID;
@@ -7,76 +8,95 @@ import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.ParallelBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
+import jade.core.behaviours.TickerBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.SearchConstraints;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 public class Healer extends Characters {
 	private static final long serialVersionUID = 1L;
 	
-	private int danoTotal;
 	
 	Random rnd = new Random( hashCode());
 	
-	MessageTemplate template ;    
+	MessageTemplate offerTemplate ;  
+	MessageTemplate sendHelpTemplate ; 
+	
+	ArrayList<AID> heroes = new ArrayList<AID>();
+	
+	int mana = 1000;
+	
+	
 	                                             
 	protected void setup() 
 	{ 
-		this.life = 1000;
-		this.danoTotal = 0;
-		this.mana = 100;
+		ACLMessage offerHelp = newMsg(ACLMessage.QUERY_REF);
 		
+		ACLMessage sendHelp = newMsg(ACLMessage.INFORM);
 		
-	    ACLMessage msg = newMsg( ACLMessage.QUERY_REF); 
-	    
-	    template = MessageTemplate.and( 
-	        MessageTemplate.MatchPerformative( ACLMessage.INFORM ),
-	        MessageTemplate.MatchConversationId( msg.getConversationId() ));
-	    
-	    SequentialBehaviour seq = new SequentialBehaviour();
-	    addBehaviour(seq);
-	    
-	    ParallelBehaviour par = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
-	    seq.addSubBehaviour(par);
-	    
-	    for (int i = 1; i <= 3; i++) {
-	    	
-	    	msg.addReceiver( new AID( "sagat" + i,  AID.ISLOCALNAME ));
-	    	
-	    	par.addSubBehaviour( new myReceiver(this, 1000, template )
-		      {
-				private static final long serialVersionUID = 1L;
+		offerTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+				MessageTemplate.MatchConversationId(offerHelp.getConversationId()));
 		
-				public void handle( ACLMessage msg ) 
-		         {  
-		            if (msg != null) {
-		            	int damage = Integer.parseInt(msg.getContent());
-		            	System.out.println("Recebeu dano de " + damage);
-		            	life -= damage;
-		            	danoTotal += damage;
-		            	System.out.println("Vida atual é " + life);
-		            }   
-		         }
-		    });
-		}
-	    
-	    seq.addSubBehaviour(new OneShotBehaviour() {
-
+		sendHelpTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+				MessageTemplate.MatchConversationId(sendHelp.getConversationId()));
+		
+		heroes = searchDF("Fighter");
+		
+		addBehaviour(new TickerBehaviour(this,5000) {
 			private static final long serialVersionUID = 1L;
 
-			public void action() {
-				if( life != 1000)
-					System.out.println("dano total levado: " + danoTotal);
-				else
-					System.out.println("no damage");
+			@Override
+			protected void onTick() {
+				
+				//System.out.println(myAgent.getLocalName() + " mana = " +mana);
+				if(!heroes.isEmpty()) {
+						offerHelp.addReceiver(heroes.get(0));
+						offerHelp.setContent("400");
+						send(offerHelp);
+						
+				}
+				else {
+					System.out.println(myAgent.getLocalName() + " NAO ACHOU O FIGHTER, TENTANDO NOVAMENTE");
+					heroes = searchDF("Fighter");
+				}
+				
 			}
-	    	
-	    });
-	         
-	    send ( msg );
+			
+		});
+		
+		
+	    
 	}
 	
 	//========== Utility methods =========================
-	
+	ArrayList<AID> searchDF(String service)
+	// ---------------------------------
+	{
+		DFAgentDescription dfd = new DFAgentDescription();
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType(service);
+		dfd.addServices(sd);
+
+		SearchConstraints ALL = new SearchConstraints();
+		ALL.setMaxResults(new Long(-1));
+
+		try {
+			DFAgentDescription[] result = DFService.search(this, dfd, ALL);
+			ArrayList<AID> agents = new ArrayList<AID>();
+			for (int i = 0; i < result.length; i++)
+				agents.add(result[i].getName());
+			return agents;
+
+		} catch (FIPAException fe) {
+			fe.printStackTrace();
+		}
+
+		return null;
+	}
 	
 	//--- generating Conversation IDs -------------------
 	
@@ -109,4 +129,6 @@ public class Healer extends Characters {
 	  msg.setConversationId( genCID() );
 	  return msg;
 	}
+	
+	
 }

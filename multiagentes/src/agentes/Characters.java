@@ -28,4 +28,7 @@ public abstract class Characters extends Agent {
 	public void takeDamage(int damage) {
 		this.life -= damage; 
 	}
+	public void healDamage(int damage) {
+		this.life += damage; 
+	}
 }
