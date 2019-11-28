@@ -56,11 +56,7 @@ public class Enemy extends Characters {
 		            saluteReply = saluteMsg.createReply();
 		            saluteReply.setPerformative( ACLMessage.INFORM );
 					saluteReply.setContent("yes-" + life);
-		        
-//		            System.out.println( " - " +
-//		               myAgent.getLocalName() + " <- Recebeu QUERY do " +
-//		               saluteMsg.getSender().getLocalName());
-		               
+
 		            // but only send it after a random delay
 		    
 		            addBehaviour( 
@@ -94,11 +90,9 @@ public class Enemy extends Characters {
 				                     send(fightReply); }
 				              });
 		               
-//		            send(fightReply); 
 		         }
 		         
 		         if(getLife() <= 0 ) {
-					//System.out.println("Morreu o Enemy");
 					fightReply.setContent("Morri");
 					send(fightReply);				
 					doDelete();

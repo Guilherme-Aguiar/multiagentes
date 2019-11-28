@@ -5,6 +5,7 @@ import java.util.Scanner;
 import agentes.Enemy;
 import agentes.Fighter;
 import agentes.Healer;
+import agentes.Wizard;
 import jade.core.AID;
 import jade.core.Profile;
 import jade.core.ProfileImpl;

@@ -52,7 +52,6 @@ public class Healer extends Characters {
 			@Override
 			protected void onTick() {
 				
-				//System.out.println(myAgent.getLocalName() + " mana = " +mana);
 				if(!heroes.isEmpty()) {
 						offerHelp.addReceiver(heroes.get(0));
 						offerHelp.setContent("400");

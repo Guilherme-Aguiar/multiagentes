@@ -31,4 +31,10 @@ public abstract class Characters extends Agent {
 	public void healDamage(int damage) {
 		this.life += damage; 
 	}
+	public void incrementMana() {
+		this.mana =  this.mana + 100;
+	}
+	public void resetMana() {
+		this.mana = 0;
+	}
 }
