@@ -17,11 +17,12 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.*;
 import simple.Enemy;
 
-public class Fighter extends Characters {
+public class Wizard extends Characters {
 
 	private static final long serialVersionUID = 1L;
 
-	
+	// AID[] enemies;
+
 	ArrayList<AID> enemies = new ArrayList<AID>();
 	ArrayList<Enemy> hostile = new ArrayList<Enemy>();
 
@@ -30,25 +31,25 @@ public class Fighter extends Characters {
 	MessageTemplate saluteTemplate;
 	MessageTemplate fightTemplate;
 	MessageTemplate helpTemplate;
-	
-	MessageTemplate healerOffer = MessageTemplate.MatchPerformative( ACLMessage.QUERY_REF );    
+
+	MessageTemplate healerOffer = MessageTemplate.MatchPerformative(ACLMessage.QUERY_REF);
 	MessageTemplate healerHelp = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-	
+
 	ACLMessage offerReply;
-	
+
 	Random randomGenerator = new Random();
 
 	private boolean isFighting = false;
-	
-	int counter =1;
+
+	int counter = 1;
 	int healCount = 0;
 	int randomInt;
 
 	protected void setup()
 
 	{
-		this.life = 5000;
-		
+		this.life = 3000;
+
 		ServiceDescription sd = new ServiceDescription();
 		sd.setType("Fighter");
 		sd.setName(getLocalName());
@@ -57,7 +58,7 @@ public class Fighter extends Characters {
 		ACLMessage salute = newMsg(ACLMessage.QUERY_REF);
 
 		ACLMessage fight = newMsg(ACLMessage.INFORM);
-		
+
 		ACLMessage askHelp = newMsg(ACLMessage.INFORM);
 
 		saluteTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
@@ -65,7 +66,7 @@ public class Fighter extends Characters {
 
 		fightTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
 				MessageTemplate.MatchConversationId(fight.getConversationId()));
-		
+
 		helpTemplate = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
 				MessageTemplate.MatchConversationId(askHelp.getConversationId()));
 
@@ -91,44 +92,38 @@ public class Fighter extends Characters {
 			});
 
 		}
-		
+
 		addBehaviour(new TickerBehaviour(this, 3000) {
 			private static final long serialVersionUID = 1L;
-			
-			
+
 			protected void onTick() {
-				
-				
-				
-				addBehaviour(new myReceiver(myAgent,1000,healerOffer) {
+
+				addBehaviour(new myReceiver(myAgent, 1000, healerOffer) {
 					private static final long serialVersionUID = 1L;
 
 					public void handle(ACLMessage offer) {
 						if (offer != null) {
-							if(life < 400 && healCount < 3) {
+							if (life < 400 && healCount < 3) {
 								healDamage(Integer.parseInt(offer.getContent()));
-								System.out.println("HEALER [" + offer.getSender().getLocalName() + "] - CUROU 400!" );
+								System.out.println("HEALER [" + offer.getSender().getLocalName() + "] - CUROU 400!");
 								healCount++;
 							}
 						}
 					}
 				});
 			}
-			
-			
+
 		});
-		
+
 		addBehaviour(new TickerBehaviour(this, 30000) {
 			private static final long serialVersionUID = 1L;
-			
-			
+
 			protected void onTick() {
-				healCount =0;
+				healCount = 0;
 			}
-			
-			
+
 		});
-		
+
 		seq.addSubBehaviour(new TickerBehaviour(this, 1000) {
 
 			private static final long serialVersionUID = 1L;
@@ -137,28 +132,35 @@ public class Fighter extends Characters {
 				if (!isFighting) {
 					if (!hostile.isEmpty()) {
 						fight.addReceiver(hostile.get(0).getAid());
-						isFighting = true;
-						randomInt = randomGenerator.nextInt(200) + 1;
-						fight.setContent(""+randomInt);
-
+						if (getMana() > 1000) {
+							isFighting = true;
+							randomInt = 2000;
+							resetMana();
+						} else {
+							isFighting = true;
+							randomInt = randomGenerator.nextInt(200) + 1;
+						}
+						fight.setContent("" + randomInt);
 					} else {
 						enemies = searchDF("Enemy");
-						if(!enemies.isEmpty()) {
-							
+						if (!enemies.isEmpty()) {
+
 							salute.addReceiver(enemies.get(0));
 							send(salute);
 							addBehaviour(new myReceiver(myAgent, 1000, saluteTemplate) {
 								private static final long serialVersionUID = 1L;
+
 								public void handle(ACLMessage salute) {
-									if(salute != null ) {
+									if (salute != null) {
+										// System.out.println(salute.getContent());
 										hostile.add(new Enemy(enemies.get(0), salute.getContent().split("-", 2)[1]));
-										
+
 									}
 								}
 							});
 						}
 					}
-				} 
+				}
 			}
 		});
 
@@ -176,17 +178,23 @@ public class Fighter extends Characters {
 							if (fight.getContent().equals("Morri")) {
 								hostile.remove(0);
 								isFighting = false;
-								addBehaviour(new DelayBehaviour(myAgent,1500) {
+								addBehaviour(new DelayBehaviour(myAgent, 1500) {
 									private static final long serialVersionUID = 1L;
+
 									protected void handleElapsedTimeout() {
-										System.out.println("----------- FASE " + ++counter + " -----------" );
+										System.out.println("----------- FASE " + ++counter + " -----------");
+										if(randomInt > 1000) {
+											System.out.println("BOLA DE FOGO");
+										}
 									}
 								});
-								
+
 							} else {
 								takeDamage(Integer.parseInt(fight.getContent()));
 							}
-							System.out.println("HEROI [" + myAgent.getLocalName() + "]    - VIDA ATUAL:" +  getLife());
+							
+							incrementMana();
+							System.out.println("MAGO [" + myAgent.getLocalName() + "]    - VIDA ATUAL:" + getLife());
 						}
 						if (getLife() <= 0) {
 							System.out.println("GAME OVER " + getLocalName());
@@ -196,7 +204,7 @@ public class Fighter extends Characters {
 				});
 			}
 		});
-		
+
 		send(salute);
 
 	}
