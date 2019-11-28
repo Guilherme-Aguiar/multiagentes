@@ -1,17 +1,14 @@
 package main;
 
 import java.awt.Font;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
 public class MenuInterface {
 	private JFrame window;
@@ -19,7 +16,6 @@ public class MenuInterface {
 	private JLabel title; 
 	
 	public void MenuInterface() {
-		
 	}
 	
 	public void createWindow() {
@@ -56,16 +52,32 @@ public class MenuInterface {
 		Icon imgIcon = new ImageIcon(this.getClass().getResource("geralt.jpg"));
 		JButton hero = new JButton(imgIcon);
 		hero.setBounds(70, 120, 300, 300);
-		
-		Icon imgMago = new ImageIcon(this.getClass().getResource("veigar.jpeg"));
-		JButton mago = new JButton(imgMago);
-		mago.setBounds(400, 120, 300, 300);
+		hero.setActionCommand("playHero");
+		hero.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// call hero 
+				window.dispose();
+			}
+		} );
+
+		Icon imgWizard = new ImageIcon(this.getClass().getResource("veigar.jpeg"));
+		JButton wizard = new JButton(imgWizard);
+		wizard.setBounds(400, 120, 300, 300);
+		wizard.setActionCommand("platWizard");
+		wizard.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// call wizard
+				window.dispose();
+			}
+		} );
 		
 		panel.add(title);
 		panel.add(labelHero);
 		panel.add(labelWizard);
 		panel.add(hero);
-		panel.add(mago);
+		panel.add(wizard);
 	}
 	
 }
