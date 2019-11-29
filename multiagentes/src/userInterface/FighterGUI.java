@@ -1,5 +1,6 @@
 package userInterface;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 
 import agentes.Characters;
 import agentes.DelayBehaviour;
@@ -44,6 +46,7 @@ public class FighterGUI extends JFrame {
 	private JLabel phase;
 	private JLabel vs;
 	private JLabel hero;
+	private JLabel enemy;
 	private int phaseNum;
 	private int life;
 	private int lifeEnemy;
@@ -77,19 +80,22 @@ public class FighterGUI extends JFrame {
 
 		bar = new JProgressBar(0, a.getLife());
 		bar.setBounds(80, 100, 200, 20);
+		bar.setForeground(Color.blue);
 		
 		barEnemy = new JProgressBar(0, 1000);
 		barEnemy.setBounds(480, 100, 200, 20);
+		barEnemy.setForeground(Color.RED);
 		
 		Icon imgIcon = new ImageIcon(this.getClass().getResource("fighter3.gif"));
 		hero = new JLabel(imgIcon);
 		hero.setBounds(30, 130, 300, 300);
 		
 		Icon imgEnemy = new ImageIcon(this.getClass().getResource("enemy1.gif"));
-		JLabel enemy = new JLabel(imgEnemy);
+		enemy = new JLabel(imgEnemy);
 		enemy.setBounds(430, 130, 300, 300);
 
 		life = a.getLife();
+		int aux = a.getLife();
 		bar.setValue(life);
 
 		lifeEnemy = 1000;
@@ -112,7 +118,13 @@ public class FighterGUI extends JFrame {
 	}
 
 	public void updateBar(int life) {
+		if(life > this.life) {
+			bar.setForeground(Color.GREEN);
+		}else {
+			bar.setForeground(Color.blue);
+		}
 		this.life = life;
+		
 		if (this.life <= 0) {
 			title.setText("GAME OVER!");
 			title.setBounds(330,10, 200, 100);

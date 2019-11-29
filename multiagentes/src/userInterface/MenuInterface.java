@@ -101,7 +101,7 @@ public class MenuInterface {
         Profile profile = new ProfileImpl();
         profile.setParameter(Profile.PLATFORM_ID, "172.18.0.1:1099/JADE");
         profile.setParameter(Profile.MAIN_HOST, "localhost");
-        profile.setParameter(Profile.GUI, "true");
+        profile.setParameter(Profile.GUI, "false");
 
         containerController = runtime.createMainContainer(profile);
         
