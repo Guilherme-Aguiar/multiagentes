@@ -76,7 +76,7 @@ public class MenuInterface {
 			}
 		} );
 
-		Icon imgWizard = new ImageIcon(this.getClass().getResource("mage.gif"));
+		Icon imgWizard = new ImageIcon(this.getClass().getResource("wizard.gif"));
 		JButton wizard = new JButton(imgWizard);
 		wizard.setBounds(400, 120, 300, 300);
 		wizard.setActionCommand("platWizard");

@@ -16,13 +16,16 @@ import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.*;
 import simple.Enemy;
+import userInterface.FighterGUI;
+import userInterface.WizardGUI;
 
 public class Wizard extends Characters {
 
 	private static final long serialVersionUID = 1L;
 
 	// AID[] enemies;
-
+	private WizardGUI myGui;
+	
 	ArrayList<AID> enemies = new ArrayList<AID>();
 	ArrayList<Enemy> hostile = new ArrayList<Enemy>();
 
@@ -49,6 +52,10 @@ public class Wizard extends Characters {
 
 	{
 		this.life = 3000;
+		myGui = new WizardGUI(this);
+		myGui.showGui();
+
+		
 
 		ServiceDescription sd = new ServiceDescription();
 		sd.setType("Fighter");
@@ -170,6 +177,7 @@ public class Wizard extends Characters {
 			@Override
 			protected void onTick() {
 				send(fight);
+				myGui.updateEnemyBar(randomInt);
 				addBehaviour(new myReceiver(myAgent, 1000, fightTemplate) {
 					private static final long serialVersionUID = 1L;
 
@@ -195,6 +203,7 @@ public class Wizard extends Characters {
 							
 							incrementMana();
 							System.out.println("MAGO [" + myAgent.getLocalName() + "]    - VIDA ATUAL:" + getLife());
+							myGui.updateBar(getLife());
 						}
 						if (getLife() <= 0) {
 							System.out.println("GAME OVER " + getLocalName());
