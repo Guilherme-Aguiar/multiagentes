@@ -71,8 +71,8 @@ public class MenuInterface {
 		hero.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				callAgent("Hero");
 				window.dispose();
+				callAgent("Hero");
 			}
 		} );
 
@@ -83,8 +83,8 @@ public class MenuInterface {
 		wizard.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				callAgent("Wizard");
 				window.dispose();
+				callAgent("Wizard");
 			}
 		} );
 		

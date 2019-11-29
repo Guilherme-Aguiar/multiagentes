@@ -16,6 +16,7 @@ import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.*;
 import simple.Enemy;
+import userInterface.FighterGUI;
 
 public class Fighter extends Characters {
 
@@ -26,6 +27,8 @@ public class Fighter extends Characters {
 	ArrayList<Enemy> hostile = new ArrayList<Enemy>();
 
 	Random rnd = new Random(hashCode());
+	
+	private FighterGUI myGui;
 
 	MessageTemplate saluteTemplate;
 	MessageTemplate fightTemplate;
@@ -48,7 +51,8 @@ public class Fighter extends Characters {
 
 	{
 		this.life = 5000;
-		
+		myGui = new FighterGUI(this);
+		myGui.showGui();
 		ServiceDescription sd = new ServiceDescription();
 		sd.setType("Fighter");
 		sd.setName(getLocalName());
@@ -97,9 +101,7 @@ public class Fighter extends Characters {
 			
 			
 			protected void onTick() {
-				
-				
-				
+		
 				addBehaviour(new myReceiver(myAgent,1000,healerOffer) {
 					private static final long serialVersionUID = 1L;
 
@@ -140,7 +142,6 @@ public class Fighter extends Characters {
 						isFighting = true;
 						randomInt = randomGenerator.nextInt(200) + 1;
 						fight.setContent(""+randomInt);
-
 					} else {
 						enemies = searchDF("Enemy");
 						if(!enemies.isEmpty()) {
@@ -152,7 +153,6 @@ public class Fighter extends Characters {
 								public void handle(ACLMessage salute) {
 									if(salute != null ) {
 										hostile.add(new Enemy(enemies.get(0), salute.getContent().split("-", 2)[1]));
-										
 									}
 								}
 							});
@@ -168,6 +168,7 @@ public class Fighter extends Characters {
 			@Override
 			protected void onTick() {
 				send(fight);
+				myGui.updateEnemyBar(randomInt);
 				addBehaviour(new myReceiver(myAgent, 1000, fightTemplate) {
 					private static final long serialVersionUID = 1L;
 
@@ -184,9 +185,12 @@ public class Fighter extends Characters {
 								});
 								
 							} else {
-								takeDamage(Integer.parseInt(fight.getContent()));
+								int damage = Integer.parseInt(fight.getContent()); 
+								takeDamage(damage);
+								
 							}
 							System.out.println("HEROI [" + myAgent.getLocalName() + "]    - VIDA ATUAL:" +  getLife());
+							myGui.updateBar(getLife());
 						}
 						if (getLife() <= 0) {
 							System.out.println("GAME OVER " + getLocalName());
