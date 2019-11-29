@@ -64,7 +64,7 @@ public class MenuInterface {
 		labelWizard.setBounds(520, 50, 100, 100);
 		labelWizard.setFont(f);
 		
-		Icon imgIcon = new ImageIcon(this.getClass().getResource("geralt.jpg"));
+		Icon imgIcon = new ImageIcon(this.getClass().getResource("fighter3.gif"));
 		JButton hero = new JButton(imgIcon);
 		hero.setBounds(70, 120, 300, 300);
 		hero.setActionCommand("playHero");
@@ -76,7 +76,7 @@ public class MenuInterface {
 			}
 		} );
 
-		Icon imgWizard = new ImageIcon(this.getClass().getResource("veigar.jpeg"));
+		Icon imgWizard = new ImageIcon(this.getClass().getResource("mage.gif"));
 		JButton wizard = new JButton(imgWizard);
 		wizard.setBounds(400, 120, 300, 300);
 		wizard.setActionCommand("platWizard");

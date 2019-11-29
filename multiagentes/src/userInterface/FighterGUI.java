@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -36,13 +39,15 @@ public class FighterGUI extends JFrame {
 	private JPanel panel;
 	private JLabel title;
 	private Fighter myAgent;
-	private static JProgressBar bar;
-	private static JProgressBar barEnemy;
-	private static JLabel phase;
+	private JProgressBar bar;
+	private JProgressBar barEnemy;
+	private JLabel phase;
+	private JLabel vs;
+	private JLabel hero;
 	private int phaseNum;
 	private int life;
 	private int lifeEnemy;
-
+	
 
 	public FighterGUI(Fighter a) {
 		super(a.getLocalName());
@@ -57,56 +62,78 @@ public class FighterGUI extends JFrame {
 
 		panel = new JPanel();
 		panel.setBounds(5, 5, 790, 590);
-		
+		panel.setLayout(null);
+
 		phaseNum = 1;
 		
+		title = new JLabel("RPG Multiagentes");
+		title.setBounds(310,10, 200, 100);
+
 		phase = new JLabel("Fase " + phaseNum);
+		phase.setBounds(350,60, 100, 100);
 		
-		bar = new JProgressBar(0,a.getLife());
-		barEnemy = new JProgressBar(0,1000);
+		vs = new JLabel("VS");
+		vs.setBounds(360, 200, 100, 100);
+
+		bar = new JProgressBar(0, a.getLife());
+		bar.setBounds(80, 100, 200, 20);
 		
+		barEnemy = new JProgressBar(0, 1000);
+		barEnemy.setBounds(480, 100, 200, 20);
+		
+		Icon imgIcon = new ImageIcon(this.getClass().getResource("fighter3.gif"));
+		hero = new JLabel(imgIcon);
+		hero.setBounds(30, 130, 300, 300);
+		
+		Icon imgEnemy = new ImageIcon(this.getClass().getResource("enemy1.gif"));
+		JLabel enemy = new JLabel(imgEnemy);
+		enemy.setBounds(430, 130, 300, 300);
+
 		life = a.getLife();
 		bar.setValue(life);
-		
+
 		lifeEnemy = 1000;
 		barEnemy.setValue(lifeEnemy);
-		//bar.setStringPainted(true);
-		
+		// bar.setStringPainted(true);
+
+		panel.add(title);
 		panel.add(phase);
+		panel.add(vs);
 		panel.add(bar);
 		panel.add(barEnemy);
-		
+		panel.add(enemy);
+		panel.add(hero);
+
 		window.add(panel);
 	}
 
 	public void showGui() {
 		window.setVisible(true);
 	}
-	
+
 	public void updateBar(int life) {
 		this.life = life;
-		if(this.life <= 0) {
-			JLabel gameOver = new JLabel("GAME OVER");
-			panel.removeAll();
-			panel.add(gameOver);
+		if (this.life <= 0) {
+			title.setText("GAME OVER!");
+			title.setBounds(330,10, 200, 100);
+			panel.remove(hero);
 		}
 		bar.setValue(this.life);
 		window.repaint();
 	}
-	
+
 	public void updateEnemyBar(int damage) {
 		this.lifeEnemy = this.lifeEnemy - damage;
-		
-		if(this.lifeEnemy <= 0) {
+
+		if (this.lifeEnemy <= 0) {
 			phaseNum++;
 			phase.setText("Fase " + phaseNum);
 			this.lifeEnemy = 1000;
 			barEnemy.setValue(this.lifeEnemy);
-		}else {
-			barEnemy.setValue(this.lifeEnemy);			
+		} else {
+			barEnemy.setValue(this.lifeEnemy);
 		}
 		window.repaint();
 	}
-	
 
 }
