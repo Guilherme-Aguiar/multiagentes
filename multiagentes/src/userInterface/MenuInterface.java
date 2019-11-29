@@ -1,4 +1,4 @@
-package main;
+package userInterface;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -10,7 +10,22 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import agentes.Enemy;
+import agentes.Fighter;
+import agentes.Healer;
+import agentes.Wizard;
+import jade.core.Profile;
+import jade.core.ProfileImpl;
+import jade.wrapper.AgentContainer;
+import jade.wrapper.AgentController;
+import jade.wrapper.StaleProxyException;
+
 public class MenuInterface {
+	
+	private static AgentContainer containerController;
+	private static AgentController agentController;
+
+	
 	private JFrame window;
 	private JPanel panel;
 	private JLabel title; 
@@ -56,7 +71,7 @@ public class MenuInterface {
 		hero.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// call hero 
+				callAgent("Hero");
 				window.dispose();
 			}
 		} );
@@ -68,7 +83,7 @@ public class MenuInterface {
 		wizard.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// call wizard
+				callAgent("Wizard");
 				window.dispose();
 			}
 		} );
@@ -78,6 +93,40 @@ public class MenuInterface {
 		panel.add(labelWizard);
 		panel.add(hero);
 		panel.add(wizard);
+	}
+	
+	public void callAgent(String character) {
+		
+		jade.core.Runtime runtime = jade.core.Runtime.instance();
+        Profile profile = new ProfileImpl();
+        profile.setParameter(Profile.PLATFORM_ID, "172.18.0.1:1099/JADE");
+        profile.setParameter(Profile.MAIN_HOST, "localhost");
+        profile.setParameter(Profile.GUI, "true");
+
+        containerController = runtime.createMainContainer(profile);
+        
+        try {
+        	if(character.equals("Hero")) {
+    
+        		agentController = containerController.createNewAgent("Hero", Fighter.class.getName(), null);
+        		
+        	}else {
+        		
+        		agentController = containerController.createNewAgent("Wizard", Wizard.class.getName(), null);
+        		
+        	}
+            agentController.start();
+            agentController = containerController.createNewAgent("Healer", Healer.class.getName(), null);
+            agentController.start();
+            
+            for(int i = 0; i < 20; i++) {
+                agentController = containerController.createNewAgent("Monster " + i, Enemy.class.getName(), null);
+                agentController.start();
+            }
+
+        } catch (StaleProxyException s) {
+            s.printStackTrace();
+        }    
 	}
 	
 }
