@@ -141,10 +141,14 @@ public WizardGUI(Wizard a) {
 			phase.setText("Fase " + phaseNum);
 			this.lifeEnemy = 1000;
 			barEnemy.setValue(this.lifeEnemy);
+			panel.setBackground(new JPanel().getBackground());
 		} else {
 			barEnemy.setValue(this.lifeEnemy);
 		}
 		window.repaint();
+	}
+	public void specialAtack() {
+		panel.setBackground(Color.black);
 	}
 
 }

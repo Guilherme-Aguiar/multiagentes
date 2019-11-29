@@ -192,6 +192,7 @@ public class Wizard extends Characters {
 									protected void handleElapsedTimeout() {
 										System.out.println("----------- FASE " + ++counter + " -----------");
 										if(randomInt > 1000) {
+											myGui.specialAtack();
 											System.out.println("BOLA DE FOGO");
 										}
 									}
